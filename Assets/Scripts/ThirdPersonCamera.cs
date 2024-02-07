@@ -13,6 +13,18 @@ public class ThirdPersonCamera : MonoBehaviour
 
     public float rotationSpeed;
 
+
+
+    public Transform combatLookAt;
+
+    public CameraStyle currentStyle;
+    public enum CameraStyle
+    {
+        Basic,
+        Combat
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,14 +40,28 @@ public class ThirdPersonCamera : MonoBehaviour
         orientation.forward = viewDir.normalized;
 
         //rotate plater object
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-
-        if (inputDir != Vector3.zero)
+        if(currentStyle == CameraStyle.Basic)
         {
-            playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float verticalInput = Input.GetAxis("Vertical");
+            Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+
+            if (inputDir != Vector3.zero)
+            {
+                playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+            }
         }
+
+        else if(currentStyle == CameraStyle.Combat)
+        {
+            Vector3 dirToCombatLookAt = combatLookAt.position - new Vector3(transform.position.x, combatLookAt.position.y, transform.position.y);
+            orientation.forward = dirToCombatLookAt.normalized;
+
+            playerObj.forward = dirToCombatLookAt.normalized;
+        }
+
+
     }
 }
